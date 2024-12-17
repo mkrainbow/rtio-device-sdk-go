@@ -31,7 +31,7 @@ import (
 
 func handler(ctx context.Context, req []byte) (<-chan []byte, error) {
 
-	log.Printf("received [%s] and reply [world*]", string(req))
+	log.Printf("received [%s] and reply [world! *]", string(req))
 
 	respChan := make(chan []byte, 1)
 	go func(context.Context, <-chan []byte) {
@@ -50,7 +50,7 @@ func handler(ctx context.Context, req []byte) (<-chan []byte, error) {
 				return
 			case <-t.C:
 				log.Println("Notify")
-				respChan <- []byte("world " + strconv.Itoa(i))
+				respChan <- []byte("world! " + strconv.Itoa(i))
 				i++
 				if i >= 10 {
 					return
