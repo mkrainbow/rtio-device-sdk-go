@@ -37,12 +37,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Default Settings for connection.
 const (
-	DEVICE_HEARTBEAT_SECONDS_DEFAULT = 300
-	DEVICE_CONNECT_MAX_TIMES         = 20
-	DEVICE_CONNECT_INTERVAL_SECONDS  = 3
+	DeviceHeartbeatSecondsDefault = 300
+	DeviceConnectMaxTimes         = 20
+	DeviceConnectIntervalSeconds  = 3
 )
 
+// Error Code for RTIO SDK.
 var (
 	ErrDataType             = errors.New("ErrDataType")
 	ErrOverCapacity         = errors.New("ErrOverCapacity")
@@ -85,16 +87,16 @@ func Connect(ctx context.Context, deviceID, deviceSecret, serverAddr string) (*D
 	var conn net.Conn
 	var err error
 	tryTime := 1
-	for ; tryTime <= DEVICE_CONNECT_MAX_TIMES; tryTime++ {
+	for ; tryTime <= DeviceConnectMaxTimes; tryTime++ {
 		conn, err = net.DialTimeout("tcp", serverAddr, time.Second*60)
 		if err != nil {
 			log.Error().Err(err).Int("trytimes", tryTime).Msg("Connect server error, connect later")
-			time.Sleep(time.Second * DEVICE_CONNECT_INTERVAL_SECONDS)
+			time.Sleep(time.Second * DeviceConnectIntervalSeconds)
 			continue
 		}
 		break
 	}
-	if tryTime > DEVICE_CONNECT_MAX_TIMES {
+	if tryTime > DeviceConnectMaxTimes {
 		log.Error().Err(ErrConnectTimesExceeded).Int("time", tryTime).Msg("Connect server error, retry times exceeded")
 		return nil, ErrConnectTimesExceeded
 	}
@@ -102,7 +104,7 @@ func Connect(ctx context.Context, deviceID, deviceSecret, serverAddr string) (*D
 	return session, nil
 }
 
-// ConnectWithLocalAddr For Testing
+// ConnectWithLocalAddr For Testing.
 //
 // Example:
 //
@@ -120,16 +122,16 @@ func ConnectWithLocalAddr(ctx context.Context, deviceID, deviceSecret, localAddr
 
 	var conn net.Conn
 	tryTime := 1
-	for ; tryTime <= DEVICE_CONNECT_MAX_TIMES; tryTime++ {
+	for ; tryTime <= DeviceConnectMaxTimes; tryTime++ {
 		conn, err = dialer.Dial("tcp", serverAddr)
 		if err != nil {
 			log.Error().Err(err).Int("trytimes", tryTime).Msg("Connect server error, connect later")
-			time.Sleep(time.Second * DEVICE_CONNECT_INTERVAL_SECONDS)
+			time.Sleep(time.Second * DeviceConnectIntervalSeconds)
 			continue
 		}
 		break
 	}
-	if tryTime > DEVICE_CONNECT_MAX_TIMES {
+	if tryTime > DeviceConnectMaxTimes {
 		log.Error().Err(ErrConnectTimesExceeded).Int("time", tryTime).Msg("Connect server error, retry times exceeded")
 		return nil, ErrConnectTimesExceeded
 	}
@@ -159,16 +161,16 @@ func ConnectWithTLS(ctx context.Context, deviceID, deviceSecret, serverAddr, caF
 
 	var conn net.Conn
 	tryTime := 1
-	for ; tryTime <= DEVICE_CONNECT_MAX_TIMES; tryTime++ {
+	for ; tryTime <= DeviceConnectMaxTimes; tryTime++ {
 		conn, err = tls.DialWithDialer(dialer, "tcp", serverAddr, conf)
 		if err != nil {
 			log.Error().Err(err).Int("trytimes", tryTime).Msg("Connect server error, connect later")
-			time.Sleep(time.Second * DEVICE_CONNECT_INTERVAL_SECONDS)
+			time.Sleep(time.Second * DeviceConnectIntervalSeconds)
 			continue
 		}
 		break
 	}
-	if tryTime > DEVICE_CONNECT_MAX_TIMES {
+	if tryTime > DeviceConnectMaxTimes {
 		log.Error().Err(ErrConnectTimesExceeded).Int("time", tryTime).Msg("Connect server error, retry times exceeded")
 		return nil, ErrConnectTimesExceeded
 	}
@@ -188,16 +190,16 @@ func ConnectWithTLSSkipVerify(ctx context.Context, deviceID, deviceSecret, serve
 	var err error
 	var conn net.Conn
 	tryTime := 1
-	for ; tryTime <= DEVICE_CONNECT_MAX_TIMES; tryTime++ {
+	for ; tryTime <= DeviceConnectMaxTimes; tryTime++ {
 		conn, err = tls.DialWithDialer(dialer, "tcp", serverAddr, conf)
 		if err != nil {
 			log.Error().Err(err).Int("trytime", tryTime).Msg("Connect server error, connect later")
-			time.Sleep(time.Second * DEVICE_CONNECT_INTERVAL_SECONDS)
+			time.Sleep(time.Second * DeviceConnectIntervalSeconds)
 			continue
 		}
 		break
 	}
-	if tryTime > DEVICE_CONNECT_MAX_TIMES {
+	if tryTime > DeviceConnectMaxTimes {
 		log.Error().Err(ErrConnectTimesExceeded).Int("time", tryTime).Msg("Connect server error, retry times exceeded")
 		return nil, ErrConnectTimesExceeded
 	}
@@ -225,7 +227,7 @@ func newDeviceSession(conn net.Conn, deviceId, deviceSecret, serverAddr string, 
 		regPostHandlerMap:  make(map[uint32]func(req []byte) ([]byte, error), 1),
 		regObGetHandlerMap: make(map[uint32]func(ctx context.Context, req []byte) (<-chan []byte, error), 1),
 		conn:               conn,
-		heartbeatSeconds:   DEVICE_HEARTBEAT_SECONDS_DEFAULT,
+		heartbeatSeconds:   DeviceHeartbeatSecondsDefault,
 		reconnectTimes:     0,
 	}
 	s.rollingHeaderID = 0
@@ -809,7 +811,7 @@ func (s *DeviceSession) serve(ctx context.Context, errChan chan<- error) {
 
 	// device define heartbeat's timeout
 	s.heartbeatSeconds = 60
-	if s.heartbeatSeconds != DEVICE_HEARTBEAT_SECONDS_DEFAULT {
+	if s.heartbeatSeconds != DeviceHeartbeatSecondsDefault {
 		s.pingRemoteSet(s.heartbeatSeconds)
 	}
 

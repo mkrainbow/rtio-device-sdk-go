@@ -34,7 +34,7 @@ var (
 )
 
 // not thread-safe
-func (s *DeviceSession) RegisterPostHandler(uri string, handler func(req []byte) ([]byte, error)) error {
+func (s *DeviceSession) RegisterCoPostHandler(uri string, handler func(req []byte) ([]byte, error)) error {
 	d := rtioutil.URIHash(uri)
 	_, ok := s.regPostHandlerMap[d]
 	if ok {
