@@ -1,28 +1,24 @@
 # RTIO-DEVICE-SDK-GO
 
-> English | [简体中文](./README-CN.md)  
-> The author's native language is Chinese. This document is translated using AI.
+RTIO-DEVICE-SDK-GO为Golang版的设备端SDK，用于连接RTIO服务。
 
+设备也是服务资源的提供者，RTIO采取REST-Like模型，使设备端开发高效和有趣。
 
-RTIO-DEVICE-SDK-GO is a Go version of the device-side SDK for connecting to the RTIO service.
+## 运行Demo
 
-Devices are also resource providers in RTIO. RTIO uses a REST-Like model, making device-side development efficient and enjoyable.
+目前仅在Linux环境下测试。
 
-## Run Demo
+### RTIO服务端运行
 
-Currently tested only on Linux environments.
+#### 通过源码运行RTIO
 
-### RTIO Server Setup
+工具：
 
-#### Run RTIO from Source
-
-Tools：
-
-- Golang: Version 1.21.0 or higher.
-- GNU Make: Recommended version 4.3 or higher.
+- Golang：版本1.21.0或以上。
+- GNU Make：建议版本4.3或以上。
 - Git.
 
-Clone source code：
+获取代码。
 
 ```sh
 $ git clone https://github.com/mkrainbow/rtio.git
@@ -32,18 +28,18 @@ $ ls ./out/
 examples  rtio
 ```
 
-To run the service, use the following command. You can view the help with `./out/rtio -h`.
+通过以下命令运行服务，可通过`./out/rtio -h`查看帮助。
 
 ```sh
 $ ./out/rtio -disable.deviceverify -disable.hubconfiger -log.level info
 2024-12-19 17:07:14.198 INF rtio starting ...
 ```
 
-#### Run RTIO via Docker
+#### 通过Docker运行RTIO
 
-Coming soon.
+准备中。
 
-#### Run Device Demo
+#### 运行设备端Demo
 
 ```sh
 $ git clone https://github.com/mkrainbow/rtio-device-sdk-go.git
@@ -54,20 +50,20 @@ $ ls out/
 simple_device  simple_device_copost_to_server  simple_device_obget  simple_device_tls
 ```
 
-run `simple_device`。
+运行`simple_device`。
 
 ```sh
 ./out/simple_device
 ```
 
-Open another terminal and use `curl` to request the device's URI `/rainbow` through the RTIO service, sending the string "hello" to the device, which responds with "world".
+打开另一终端运行`curl`模拟请求到设备。
 
 ```sh
 $  curl http://localhost:17917/cfa09baa-4913-4ad7-a936-3e26f9671b09 -d '{"method":"copost", "uri":"/rainbow","id":12667,"data":"aGVsbG8="}'
 {"id":12667,"fid":0,"code":"OK","data":"d29ybGQ="}
 ```
 
-Here, "aGVsbG8=" is the base64 encoding of "hello", and "d29ybGQ=" is the base64 encoding of "world". You can encode and decode in the terminal using the following commands
+其中，"aGVsbG8="为"hello"的base64编码，"d29ybGQ="为"world"的base64编码。可通过以下命令在终端里编解码。
 
 ```sh
 $ echo -n "hello" | base64       # Encode
@@ -76,22 +72,22 @@ $ echo -n "d29ybGQ=" | base64 -d # Decode
 world
 ```
 
-Output on the device side：
+设备端输出：
 
 ```sh
 $ ./out/simple_device
 received [hello] and reply [world]
 ```
 
-## SDK Integration
+## SDK集成
 
-Add library：
+添加库：
 
 ```sh  
 go get github.com/mkrainbow/rtio-device-sdk-go
 ```
 
-Integrate the rtio-device-sdk-go library：
+使用库：
 
 ```go
 import (

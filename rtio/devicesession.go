@@ -44,7 +44,7 @@ const (
 	DeviceConnectIntervalSeconds  = 3
 )
 
-// Error Code for RTIO SDK.
+// Error Code for the Connection.
 var (
 	ErrDataType             = errors.New("ErrDataType")
 	ErrOverCapacity         = errors.New("ErrOverCapacity")
@@ -60,12 +60,14 @@ var (
 	ErrConnectTimesExceeded = errors.New("ErrConnectTimesExceeded")
 )
 
+// ConnectOptions holds the options for establishing a connection to a server.
 type ConnnectOptions struct {
 	method    string
 	localAddr string
 	caFile    string
 }
 
+// DeviceSession represents a session for interacting with a connected device.
 type DeviceSession struct {
 	deviceID            string
 	deviceSecret        string
@@ -83,6 +85,7 @@ type DeviceSession struct {
 	reconnectTimes      uint16
 }
 
+// Connect establishes a connection to a server with the provided device credentials.
 func Connect(ctx context.Context, deviceID, deviceSecret, serverAddr string) (*DeviceSession, error) {
 	var conn net.Conn
 	var err error
@@ -104,11 +107,7 @@ func Connect(ctx context.Context, deviceID, deviceSecret, serverAddr string) (*D
 	return session, nil
 }
 
-// ConnectWithLocalAddr For Testing.
-//
-// Example:
-//
-//	session, err := ds.ConnectWithLocalAddr(context.Background(), *deviceID, *deviceSecret, "127.0.0.1:19119", *serverAddr)
+// ConnectWithLocalAddr establishes a connection with a specified local address. Usually for testing.
 func ConnectWithLocalAddr(ctx context.Context, deviceID, deviceSecret, localAddr, serverAddr string) (*DeviceSession, error) {
 
 	connOptions := &ConnnectOptions{method: "with_local_addr", localAddr: localAddr}
@@ -140,6 +139,7 @@ func ConnectWithLocalAddr(ctx context.Context, deviceID, deviceSecret, localAddr
 	return session, nil
 }
 
+// ConnectWithTLS establishes a TLS-encrypted connection to the server.
 func ConnectWithTLS(ctx context.Context, deviceID, deviceSecret, serverAddr, caFile string) (*DeviceSession, error) {
 
 	connOptions := &ConnnectOptions{method: "with_tls", caFile: caFile}
@@ -178,6 +178,8 @@ func ConnectWithTLS(ctx context.Context, deviceID, deviceSecret, serverAddr, caF
 	session := newDeviceSession(conn, deviceID, deviceSecret, serverAddr, connOptions)
 	return session, nil
 }
+
+// ConnectWithTLSSkipVerify establishes a TLS-encrypted connection, skipping certificate verification.
 func ConnectWithTLSSkipVerify(ctx context.Context, deviceID, deviceSecret, serverAddr string) (*DeviceSession, error) {
 
 	connOptions := &ConnnectOptions{method: "with_tls_skip_verify"}
@@ -208,16 +210,19 @@ func ConnectWithTLSSkipVerify(ctx context.Context, deviceID, deviceSecret, serve
 	return session, nil
 }
 
+// SetHeartbeatSeconds sets the heartbeat interval in seconds for the device session.
 func (s *DeviceSession) SetHeartbeatSeconds(n uint16) {
 	s.heartbeatSeconds = n
 }
+
+// Serve starts the device session and serves requests in background until the context is canceled.
 func (s *DeviceSession) Serve(ctx context.Context) {
 	go s.serve(ctx, s.errChan)
 	go s.recover(ctx, s.errChan)
 }
-func newDeviceSession(conn net.Conn, deviceId, deviceSecret, serverAddr string, connectOptions *ConnnectOptions) *DeviceSession {
+func newDeviceSession(conn net.Conn, deviceID, deviceSecret, serverAddr string, connectOptions *ConnnectOptions) *DeviceSession {
 	s := &DeviceSession{
-		deviceID:           deviceId,
+		deviceID:           deviceID,
 		deviceSecret:       deviceSecret,
 		serverAddr:         serverAddr,
 		connectOptions:     connectOptions,
@@ -267,7 +272,9 @@ func (s *DeviceSession) verify() error {
 	s.outgoingChan <- buf
 	return nil
 }
-func (s *DeviceSession) ping() error { // heartbeat: 0 - not update, other - using heartbeat as new value
+
+// ping heartbeat: 0 - not update, other - using heartbeat as new value
+func (s *DeviceSession) ping() error {
 	headerID, err := ru.GenUint16ID()
 	if err != nil {
 		return err
@@ -288,7 +295,9 @@ func (s *DeviceSession) ping() error { // heartbeat: 0 - not update, other - usi
 	s.outgoingChan <- buf
 	return nil
 }
-func (s *DeviceSession) pingRemoteSet(timeout uint16) error { // timeout [30, 43200]
+
+// pingRemoteSet timeout [30, 43200]
+func (s *DeviceSession) pingRemoteSet(timeout uint16) error {
 	headerID, err := ru.GenUint16ID()
 	if err != nil {
 		return err
@@ -310,6 +319,7 @@ func (s *DeviceSession) pingRemoteSet(timeout uint16) error { // timeout [30, 43
 	return nil
 }
 
+// getReconnectInterval
 // interval : [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 ...] secodes
 // level    :  0, 1, 2,  3,  4,  5,   6,   7,   8,    9,   10,   11,   12,    13,    14
 // recommend: set maxlevel=8 (max retry intervel is 8.5 minite)
@@ -837,7 +847,6 @@ func (s *DeviceSession) serve(ctx context.Context, errChan chan<- error) {
 			devicelogger.Debug().Msgf("ping req")
 			s.ping()
 		case <-storeTicker.C:
-			// servelogger.Debug().Msgf("storeTicker.C %s", time.Now().String())
 			s.sendIDStore.DelExpireKeys()
 		}
 	}
