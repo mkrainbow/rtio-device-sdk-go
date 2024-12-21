@@ -1,6 +1,8 @@
-# RTIO-DEVICE-SDK-GO
+# RTIO设备SDK-Go语言
 
-RTIO-DEVICE-SDK-GO为Golang版的设备端SDK，用于连接RTIO服务。
+> 简体中文 | [English](./README.md)
+
+Golang版的物联网设备端SDK，用于连接RTIO服务。
 
 设备也是服务资源的提供者，RTIO采取REST-Like模型，使设备端开发高效和有趣。
 
@@ -8,9 +10,11 @@ RTIO-DEVICE-SDK-GO为Golang版的设备端SDK，用于连接RTIO服务。
 
 目前仅在Linux环境下测试。
 
-### RTIO服务端运行
+### 运行RTIO服务端
 
-#### 通过源码运行RTIO
+可通过“Docker”或者“编译源码”方式运行RTIO服务。
+
+#### 编译源码运行RTIO
 
 工具：
 
@@ -37,7 +41,24 @@ $ ./out/rtio -disable.deviceverify -disable.hubconfiger -log.level info
 
 #### 通过Docker运行RTIO
 
-准备中。
+```sh
+$ sudo docker pull registry.cn-guangzhou.aliyuncs.com/rtio/rtio:v0.8.0
+v0.8.0: Pulling from rtio/rtio
+...
+Digest: sha256:...
+
+$ sudo docker run  --rm -p 17017:17017 -p 17917:17917 registry.cn-guangzhou.aliyuncs.com/rtio/rtio:v0.8.0
+2024-06-03 13:12:23.264 INF rtio starting ...
+```
+
+通过以下命令登录容器中，比如查看命令帮助。
+
+```sh
+$ sudo docker run -it --rm --entrypoint /bin/sh  -p 17017:17017 -p 17917:17917 registry.cn-guangzhou.aliyuncs.com/rtio/rtio:v0.8.0
+/home/rainbow $ ./rtio -h
+Usage of ./rtio: 
+...
+```
 
 #### 运行设备端Demo
 

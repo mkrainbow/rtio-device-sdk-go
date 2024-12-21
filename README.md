@@ -1,10 +1,9 @@
-# RTIO-DEVICE-SDK-GO
+# RTIO Device SDK for Golang
 
 > English | [简体中文](./README-CN.md)  
 > The author's native language is Chinese. This document is translated using AI.
 
-
-RTIO-DEVICE-SDK-GO is a Go version of the device-side SDK for connecting to the RTIO service.
+IoT device SDK in Go for RTIO service connectivity.
 
 Devices are also resource providers in RTIO. RTIO uses a REST-Like model, making device-side development efficient and enjoyable.
 
@@ -12,7 +11,9 @@ Devices are also resource providers in RTIO. RTIO uses a REST-Like model, making
 
 Currently tested only on Linux environments.
 
-### RTIO Server Setup
+### Running RTIO Server
+
+You can run the RTIO server either through "Docker" or by compiling from source.
 
 #### Run RTIO from Source
 
@@ -39,9 +40,26 @@ $ ./out/rtio -disable.deviceverify -disable.hubconfiger -log.level info
 2024-12-19 17:07:14.198 INF rtio starting ...
 ```
 
-#### Run RTIO via Docker
+#### Running RTIO via Docker
 
-Coming soon.
+```sh
+$ sudo docker pull registry.cn-guangzhou.aliyuncs.com/rtio/rtio:v0.8.0
+v0.8.0: Pulling from rtio/rtio
+...
+Digest: sha256:...
+
+$ sudo docker run  --rm -p 17017:17017 -p 17917:17917 registry.cn-guangzhou.aliyuncs.com/rtio/rtio:v0.8.0
+2024-06-03 13:12:23.264 INF rtio starting ...
+```
+
+You can log into the container using the following command, for example, to view the command help.
+
+```sh
+$ sudo docker run -it --rm --entrypoint /bin/sh  -p 17017:17017 -p 17917:17917 registry.cn-guangzhou.aliyuncs.com/rtio/rtio:v0.8.0
+/home/rainbow $ ./rtio -h
+Usage of ./rtio: 
+...
+```
 
 #### Run Device Demo
 
@@ -63,7 +81,7 @@ run `simple_device`。
 Open another terminal and use `curl` to request the device's URI `/rainbow` through the RTIO service, sending the string "hello" to the device, which responds with "world".
 
 ```sh
-$  curl http://localhost:17917/cfa09baa-4913-4ad7-a936-3e26f9671b09 -d '{"method":"copost", "uri":"/rainbow","id":12667,"data":"aGVsbG8="}'
+$ curl http://localhost:17917/cfa09baa-4913-4ad7-a936-3e26f9671b09 -d '{"method":"copost", "uri":"/rainbow","id":12667,"data":"aGVsbG8="}'
 {"id":12667,"fid":0,"code":"OK","data":"d29ybGQ="}
 ```
 
