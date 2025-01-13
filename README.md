@@ -26,11 +26,9 @@ Tools：
 Clone source code：
 
 ```sh
-$ git clone https://github.com/mkrainbow/rtio.git
-$ cd rtio/
-$ make
-$ ls ./out/
-examples  rtio
+git clone https://github.com/mkrainbow/rtio.git
+cd rtio
+make
 ```
 
 To run the service, use the following command. You can view the help with `./out/rtio -h`.
@@ -63,16 +61,20 @@ Usage of ./rtio:
 
 #### Run Device Demo
 
+Compile Demos.
+
 ```sh
-$ git clone https://github.com/mkrainbow/rtio-device-sdk-go.git
-$ mkdir -p out 
-$ go build -o out/ github.com/mkrainbow/rtio-device-sdk-go/...
-$ make
+git clone https://github.com/mkrainbow/rtio-device-sdk-go.git
+mkdir -p out 
+go build -o out/ github.com/mkrainbow/rtio-device-sdk-go/...
+```
+
+```sh
 $ ls out/
 simple_device  simple_device_copost_to_server  simple_device_obget  simple_device_tls
 ```
 
-run `simple_device`。
+run `simple_device`.
 
 ```sh
 ./out/simple_device

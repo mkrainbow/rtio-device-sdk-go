@@ -25,11 +25,9 @@ Golang版的物联网设备端SDK，用于连接RTIO服务。
 获取代码。
 
 ```sh
-$ git clone https://github.com/mkrainbow/rtio.git
-$ cd rtio/
-$ make
-$ ls ./out/
-examples  rtio
+git clone https://github.com/mkrainbow/rtio.git
+cd rtio
+make
 ```
 
 通过以下命令运行服务，可通过`./out/rtio -h`查看帮助。
@@ -62,11 +60,15 @@ Usage of ./rtio:
 
 #### 运行设备端Demo
 
+编译Demo。
+
 ```sh
-$ git clone https://github.com/mkrainbow/rtio-device-sdk-go.git
-$ mkdir -p out 
-$ go build -o out/ github.com/mkrainbow/rtio-device-sdk-go/...
-$ make
+git clone https://github.com/mkrainbow/rtio-device-sdk-go.git
+mkdir -p out 
+go build -o out/ github.com/mkrainbow/rtio-device-sdk-go/...
+```
+
+```sh
 $ ls out/
 simple_device  simple_device_copost_to_server  simple_device_obget  simple_device_tls
 ```
